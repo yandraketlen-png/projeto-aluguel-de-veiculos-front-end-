@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+{% load static %}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Veículos | Enterprise aluguéis de Carro</title>
+<link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/" aria-label="Enterprise aluguéis de Carro - início">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 13.5 5.1 8a2 2 0 0 1 1.8-1.2h10.2A2 2 0 0 1 19 8l2 5.5v4a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1V17H6v1.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M5 13h14M7 16h.01M17 16h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    </span>
+    <span>Enterprise <span class="brand-muted">aluguéis de Carro</span></span>
+  </a>
+  <nav class="topnav" aria-label="Navegação principal">
+    <a class="nav-link" href="/">Painel</a>
+    <a class="nav-link" href="/carros/">Carros disponíveis</a>
+    <a class="nav-link active" href="/veiculos/">Veículos</a>
+    <a class="nav-link" href="/clientes/">Clientes</a>
+    <a class="nav-link" href="/taxas-atraso/">Taxas de atraso</a>
+  </nav>
+  <a class="profile-link" href="/api-auth/login/"><span class="profile-avatar">A</span><span class="profile-label">Área administrativa</span></a>
+</header>
+
+<main class="dashboard clients-page">
+  <div class="clients-heading">
+    <div>
+      <span class="section-kicker">ADMINISTRAÇÃO DA FROTA</span>
+      <h1>Veículos</h1>
+      <p>Cadastre novos automóveis com placa e número do chassi.</p>
+    </div>
+    <a class="button button-blue" href="#novo-veiculo">+ Adicionar veículo</a>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="success-message" role="status">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <section class="clients-layout">
+    <article class="panel client-form-panel" id="novo-veiculo">
+      <div class="panel-heading"><div><span class="section-kicker">NOVO CADASTRO</span><h2>Adicionar veículo</h2></div><span class="client-form-icon" aria-hidden="true">+</span></div>
+      <p class="form-intro">Informe o modelo, a placa, o chassi, a categoria e a diária do veículo.</p>
+      <form method="post" class="client-form">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-field{% if field.errors %} has-error{% endif %}">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+          {% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </div>
+        {% endfor %}
+        <button class="button button-blue submit-client" type="submit">Salvar veículo <span aria-hidden="true">→</span></button>
+      </form>
+    </article>
+
+    <article class="panel client-list-panel">
+      <div class="panel-heading"><div><span class="section-kicker">FROTA CADASTRADA</span><h2>Veículos cadastrados</h2></div><span class="count-pill">{{ veiculos|length }} veículo{{ veiculos|length|pluralize:"s" }}</span></div>
+      <div class="sc">
+        <table class="clients-table">
+          <thead>
+            <tr>
+              <th>Modelo</th>
+              <th>Placa</th>
+              <th>Chassi</th>
+              <th>Categoria</th>
+              <th class="r">Diária</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for veiculo in veiculos %}
+            <tr>
+              <td class="customer-cell">{{ veiculo.nome }}</td>
+              <td>{{ veiculo.placa }}</td>
+              <td>{{ veiculo.chassi }}</td>
+              <td><span class="tag">{{ veiculo.categoria.nome }}</span></td>
+              <td class="r">R$ {{ veiculo.diaria|floatformat:"2g" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="empty-table">Ainda não há veículos cadastrados.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+
+  <footer class="footer"><span>© Enterprise aluguéis de Carro</span><span>Conduzindo sua próxima viagem com confiança.</span></footer>
+</main>
+</body>
+</html>

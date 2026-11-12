@@ -111,6 +111,58 @@ class ClientePageTest(TestCase):
         self.assertContains(r, "Nenhum cliente encontrado")
         self.assertNotContains(r, "Maria Silva")
 
+    def test_pagina_de_clientes_exibe_clientes_e_carros_alugados(self):
+        cliente = Cliente.objects.create(
+            nome="Maria Silva",
+            cpf=cpf_teste(),
+            telefone="61999991234",
+        )
+        categoria = Categoria.objects.create(nome="Sedã", diaria=150)
+        Aluguel.objects.create(
+            cliente=cliente,
+            categoria=categoria,
+            veiculo="Honda Civic",
+            diarias=3,
+            diaria_contratada=150,
+            horas_atraso=0,
+        )
+
+        r = self.client.get("/clientes/")
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, "Clientes cadastrados")
+        self.assertContains(r, "Carros alugados")
+        self.assertContains(r, "Maria Silva")
+        self.assertContains(r, "Honda Civic")
+
+
+class VeiculoAdminPageTest(TestCase):
+    def setUp(self):
+        User.objects.create_user(username="admin", password="senha-teste")
+        self.client.login(username="admin", password="senha-teste")
+        self.categoria = Categoria.objects.create(nome="SUV", diaria=220)
+
+    def test_pagina_de_veiculos_exige_login(self):
+        self.client.logout()
+        response = self.client.get("/veiculos/")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/api-auth/login/", response["Location"])
+
+    def test_adiciona_novo_veiculo_com_placa_e_chassi(self):
+        response = self.client.post("/veiculos/", {
+            "nome": "Toyota Corolla",
+            "marca": "Toyota",
+            "placa": "ABC1D23",
+            "chassi": "9BWZZZ377VT123456",
+            "categoria": self.categoria.pk,
+            "diaria": "180.00",
+        })
+        self.assertRedirects(response, "/veiculos/")
+        self.assertEqual(response.wsgi_request.path, "/veiculos/")
+        self.assertEqual(response.wsgi_request.resolver_match.view_name, "veiculos-admin")
+        veiculo = self.categoria.veiculos.get()
+        self.assertEqual(veiculo.placa, "ABC1D23")
+        self.assertEqual(veiculo.chassi, "9BWZZZ377VT123456")
+
 
 class CarrosDisponiveisPageTest(TestCase):
     def test_catalogo_exibe_vinte_modelos_com_diaria_e_foto(self):

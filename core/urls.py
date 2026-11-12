@@ -12,6 +12,7 @@ router.register("taxas-atraso", api.TaxasAtrasoViewSet, basename="taxas-atraso")
 urlpatterns = [
     path("", views.dashboard, name="dashboard"),
     path("carros/", views.carros_disponiveis, name="carros-disponiveis"),
+    path("veiculos/", views.veiculos_admin, name="veiculos-admin"),
     path("clientes/", views.clientes, name="clientes"),
     path("alugueis/novo/", views.novo_aluguel, name="novo-aluguel"),
     path("taxas-atraso/", views.taxas_atraso, name="pagina-taxas-atraso"),

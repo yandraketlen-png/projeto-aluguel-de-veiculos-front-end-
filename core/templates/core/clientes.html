@@ -4,16 +4,16 @@
 {% load static %}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Clientes | Aluguel de Carros Ltda.</title>
+<title>Clientes | Enterprise aluguéis de Carro</title>
 <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
 </head>
 <body>
 <header class="topbar">
-  <a class="brand" href="/" aria-label="Aluguel de Carros Ltda. - início">
+  <a class="brand" href="/" aria-label="Enterprise aluguéis de Carro - início">
     <span class="brand-mark" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none"><path d="M3 13.5 5.1 8a2 2 0 0 1 1.8-1.2h10.2A2 2 0 0 1 19 8l2 5.5v4a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1V17H6v1.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M5 13h14M7 16h.01M17 16h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
     </span>
-    <span>Aluguel de Carros <span class="brand-muted">Ltda.</span></span>
+    <span>Enterprise <span class="brand-muted">aluguéis de Carro</span></span>
   </a>
   <nav class="topnav" aria-label="Navegação principal">
     <a class="nav-link" href="/">Painel</a>
@@ -77,8 +77,27 @@
       </table></div>
       <a class="inline-link api-client-link" href="/carros/">Ver carros disponíveis <span aria-hidden="true">→</span></a>
     </article>
+
+    <article class="panel client-rentals-panel">
+      <div class="panel-heading"><div><span class="section-kicker">FROTA EM USO</span><h2>Carros alugados</h2></div><span class="count-pill">{{ alugueis|length }} aluguel{{ alugueis|length|pluralize:"s" }}</span></div>
+      <div class="sc"><table class="clients-table">
+        <thead><tr><th>Cliente</th><th>Veículo</th><th>Categoria</th><th>Diárias</th></tr></thead>
+        <tbody>
+        {% for aluguel in alugueis %}
+        <tr>
+          <td class="customer-cell">{{ aluguel.cliente.nome }}</td>
+          <td>{{ aluguel.veiculo }}</td>
+          <td><span class="tag">{{ aluguel.categoria.nome }}</span></td>
+          <td class="r">{{ aluguel.diarias }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="empty-table">Nenhum carro alugado no momento.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table></div>
+    </article>
   </section>
-  <footer class="footer"><span>© Aluguel de Carros Ltda.</span><span>Mobilidade para ir mais longe.</span></footer>
+  <footer class="footer"><span>© Enterprise aluguéis de Carro</span><span>Mobilidade para ir mais longe.</span></footer>
 </main>
 </body>
 </html>

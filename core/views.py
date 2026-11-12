@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import redirect, render
 
-from .forms import AluguelCatalogoForm, ClienteForm
+from .forms import AluguelCatalogoForm, ClienteForm, VeiculoForm
 from .catalogo import CARROS_DISPONIVEIS
 from .models import (
     LIMITE_FAIXA_HORA,
@@ -15,6 +15,7 @@ from .models import (
     Aluguel,
     Categoria,
     Cliente,
+    Veiculo,
     FAIXAS_ATRASO,
 )
 
@@ -126,6 +127,21 @@ def taxas_atraso(request):
 
 
 @login_required(login_url="/api-auth/login/")
+def veiculos_admin(request):
+    form = VeiculoForm(request.POST if request.method == "POST" else None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Veículo cadastrado com sucesso.")
+        return redirect("veiculos-admin")
+
+    veiculos = Veiculo.objects.select_related("categoria").all()
+    return render(request, "core/veiculos_admin.html", {
+        "form": form,
+        "veiculos": veiculos,
+    })
+
+
+@login_required(login_url="/api-auth/login/")
 def clientes(request):
     form = ClienteForm(request.POST if request.method == "POST" else None)
     if request.method == "POST" and form.is_valid():
@@ -142,8 +158,11 @@ def clientes(request):
             consulta |= Q(cpf__icontains=digitos)
         lista_clientes = lista_clientes.filter(consulta)
 
+    alugueis = Aluguel.objects.select_related("cliente", "categoria").all()
+
     return render(request, "core/clientes.html", {
         "form": form,
         "clientes": lista_clientes,
+        "alugueis": alugueis,
         "busca": busca,
     })

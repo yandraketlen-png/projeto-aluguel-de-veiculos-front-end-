@@ -3,7 +3,7 @@ import re
 from django import forms
 
 from .catalogo import CARROS_DISPONIVEIS
-from .models import Cliente
+from .models import Categoria, Cliente, Veiculo
 
 
 class ClienteForm(forms.ModelForm):
@@ -32,6 +32,36 @@ class ClienteForm(forms.ModelForm):
 
     def clean_telefone(self):
         return re.sub(r"\D", "", self.cleaned_data["telefone"])
+
+
+class VeiculoForm(forms.ModelForm):
+    placa = forms.CharField(
+        label="Placa",
+        help_text="Informe a placa do veículo, sem espaços.",
+        widget=forms.TextInput(attrs={"placeholder": "ABC1D23", "autocomplete": "off"}),
+    )
+    chassi = forms.CharField(
+        label="Nº do chassi",
+        help_text="Informe o número do chassi do veículo.",
+        widget=forms.TextInput(attrs={"placeholder": "9BWZZZ377VT123456", "autocomplete": "off"}),
+    )
+
+    class Meta:
+        model = Veiculo
+        fields = ["nome", "marca", "placa", "chassi", "categoria", "diaria"]
+        widgets = {
+            "nome": forms.TextInput(attrs={"placeholder": "Toyota Corolla"}),
+            "marca": forms.TextInput(attrs={"placeholder": "Toyota"}),
+            "categoria": forms.Select(attrs={"class": "select-input"}),
+            "diaria": forms.NumberInput(attrs={"step": "0.01", "min": "0"}),
+        }
+
+    def clean_placa(self):
+        placa = re.sub(r"\s+", "", self.cleaned_data["placa"]).upper()
+        return placa
+
+    def clean_chassi(self):
+        return self.cleaned_data["chassi"].strip().upper()
 
 
 class AluguelCatalogoForm(forms.Form):

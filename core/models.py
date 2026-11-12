@@ -51,6 +51,25 @@ class Cliente(models.Model):
         return self.nome
 
 
+class Veiculo(models.Model):
+    nome = models.CharField("modelo", max_length=120)
+    marca = models.CharField(max_length=80, blank=True)
+    placa = models.CharField("placa", max_length=20, unique=True)
+    chassi = models.CharField("número do chassi", max_length=30, unique=True)
+    categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT, related_name="veiculos")
+    diaria = models.DecimalField("valor da diária", max_digits=8, decimal_places=2)
+    ativo = models.BooleanField("ativo", default=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["nome"]
+        verbose_name = "veículo"
+        verbose_name_plural = "veículos"
+
+    def __str__(self):
+        return f"{self.nome} ({self.placa})"
+
+
 class Aluguel(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, related_name="alugueis")
     veiculo = models.CharField("veículo", max_length=100)
